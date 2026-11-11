@@ -1,0 +1,39 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: reactive-trading-service
+  r2dbc:
+    url: r2dbc:h2:mem:///trading_db?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+    username: sa
+    password: ""
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+---
+# Profil PostgreSQL (avec docker compose up -d)
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  r2dbc:
+    url: r2dbc:postgresql://postgres:postgrespassword@localhost:5432/trading_db
+    pool:
+      initial-size: 10
+      max-size: 30
+      max-idle-time: 30m
+  sql:
+    init:
+      mode: never
